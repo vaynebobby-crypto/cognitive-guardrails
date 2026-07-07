@@ -1,21 +1,59 @@
 {
   "name": "cognitive-guardrails",
-  "description": "A two-skill guardrail package for instruction intake review and final response review.",
-  "version": "0.2.0",
+  "description": "A cognitive guardrails skill group for first-principles prompting, adversarial review, uncertainty checks, and omission checks.",
+  "version": "0.3.0",
   "license": "MIT",
   "repository": "https://github.com/vaynebobby-crypto/cognitive-guardrails",
   "skills": [
     {
+      "name": "first-principles-prompt",
+      "description": "Pre-execution first-principles prompt discipline for separating real objectives from habitual implementation paths.",
+      "install_path": "skills/first-principles-prompt",
+      "entrypoint": "skills/first-principles-prompt/SKILL.md",
+      "openclaw_entrypoint": ".openclaw/skills/first-principles-prompt/SKILL.md",
+      "phase": "before_execution"
+    },
+    {
+      "name": "adversarial-prompt-review",
+      "description": "Pre-execution or in-flight adversarial review of prompt interpretation, plan, assumptions, authorization, evidence, and failure modes.",
+      "install_path": "skills/adversarial-prompt-review",
+      "entrypoint": "skills/adversarial-prompt-review/SKILL.md",
+      "openclaw_entrypoint": ".openclaw/skills/adversarial-prompt-review/SKILL.md",
+      "phase": "before_or_during_execution"
+    },
+    {
+      "name": "uncertainty-check",
+      "description": "Pre-delivery check that identifies what is least certain and narrows unsupported claims.",
+      "install_path": "skills/uncertainty-check",
+      "entrypoint": "skills/uncertainty-check/SKILL.md",
+      "openclaw_entrypoint": ".openclaw/skills/uncertainty-check/SKILL.md",
+      "phase": "before_final_response"
+    },
+    {
+      "name": "omission-check",
+      "description": "Pre-delivery check for the largest omission, blind spot, or unnoticed consequence.",
+      "install_path": "skills/omission-check",
+      "entrypoint": "skills/omission-check/SKILL.md",
+      "openclaw_entrypoint": ".openclaw/skills/omission-check/SKILL.md",
+      "phase": "before_final_response"
+    },
+    {
       "name": "instruction-intake-guardrails",
-      "description": "Pre-task instruction understanding, first principles, authorization boundary, goal drift, risk, blocker, and verification planning guardrails.",
+      "description": "Compatibility aggregate for pre-execution guardrails.",
       "install_path": "skills/instruction-intake-guardrails",
-      "entrypoint": "skills/instruction-intake-guardrails/SKILL.md"
+      "entrypoint": "skills/instruction-intake-guardrails/SKILL.md",
+      "openclaw_entrypoint": ".openclaw/skills/instruction-intake-guardrails/SKILL.md",
+      "phase": "before_execution",
+      "compatibility": true
     },
     {
       "name": "final-response-guardrails",
-      "description": "Pre-final delivery review for claims, verification evidence, unfinished work, blockers, uncertainty, and overpromising.",
+      "description": "Compatibility aggregate for pre-delivery guardrails.",
       "install_path": "skills/final-response-guardrails",
-      "entrypoint": "skills/final-response-guardrails/SKILL.md"
+      "entrypoint": "skills/final-response-guardrails/SKILL.md",
+      "openclaw_entrypoint": ".openclaw/skills/final-response-guardrails/SKILL.md",
+      "phase": "before_final_response",
+      "compatibility": true
     }
   ],
   "compatibility_entrypoint": "SKILL.md",

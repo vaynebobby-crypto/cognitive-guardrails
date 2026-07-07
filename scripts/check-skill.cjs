@@ -3,10 +3,18 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const skillNames = [
+const coreSkillNames = [
+  'first-principles-prompt',
+  'adversarial-prompt-review',
+  'uncertainty-check',
+  'omission-check'
+];
+const compatibilitySkillNames = [
   'instruction-intake-guardrails',
   'final-response-guardrails'
 ];
+const requiredSkillNames = [...coreSkillNames, ...compatibilitySkillNames];
+const bannedTerms = ['pony' + 'tail', 'Dietrich' + 'Gebert'];
 let failed = false;
 
 function fail(message) {
@@ -35,6 +43,35 @@ function parseJson(relativePath) {
   }
 }
 
+function listFiles(dir) {
+  const absolute = path.join(root, dir);
+  if (!fs.existsSync(absolute)) return [];
+
+  const out = [];
+  for (const entry of fs.readdirSync(absolute, { withFileTypes: true })) {
+    if (entry.name === '.git') continue;
+    const relative = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      out.push(...listFiles(relative));
+    } else if (entry.isFile()) {
+      out.push(relative);
+    }
+  }
+  return out;
+}
+
+function parseFrontmatter(relativePath) {
+  const skill = readText(relativePath);
+  const frontmatter = skill.match(/^---\n([\s\S]*?)\n---\n/);
+  if (!frontmatter) {
+    fail(`${relativePath} must start with YAML frontmatter delimited by ---`);
+    return null;
+  }
+
+  pass(`${relativePath} has frontmatter`);
+  return frontmatter[1];
+}
+
 for (const file of ['SKILL.md', 'README.md', 'README.en.md', 'openclaw.json', 'meta.json']) {
   if (exists(file)) {
     pass(`${file} exists`);
@@ -43,7 +80,13 @@ for (const file of ['SKILL.md', 'README.md', 'README.en.md', 'openclaw.json', 'm
   }
 }
 
-for (const name of skillNames) {
+if (coreSkillNames.length >= 4) {
+  pass('at least four core skills are configured');
+} else {
+  fail('at least four core skills must be configured');
+}
+
+for (const name of requiredSkillNames) {
   const relativePath = `skills/${name}/SKILL.md`;
   if (!exists(relativePath)) {
     fail(`${relativePath} is missing`);
@@ -51,15 +94,9 @@ for (const name of skillNames) {
   }
 
   pass(`${relativePath} exists`);
-  const skill = readText(relativePath);
-  const frontmatter = skill.match(/^---\n([\s\S]*?)\n---\n/);
-  if (!frontmatter) {
-    fail(`${relativePath} must start with YAML frontmatter delimited by ---`);
-    continue;
-  }
+  const yaml = parseFrontmatter(relativePath);
+  if (!yaml) continue;
 
-  pass(`${relativePath} has frontmatter`);
-  const yaml = frontmatter[1];
   if (new RegExp(`^name:\\s*${name}\\s*$`, 'm').test(yaml)) {
     pass(`${relativePath} name is ${name}`);
   } else {
@@ -77,35 +114,33 @@ for (const name of skillNames) {
   } else {
     pass(`${relativePath} frontmatter is minimal (no argument-hint)`);
   }
-}
 
-const intake = exists('skills/instruction-intake-guardrails/SKILL.md')
-  ? readText('skills/instruction-intake-guardrails/SKILL.md')
-  : '';
-for (const phrase of ['Authorization boundary', 'Goal drift', 'Blockers', 'Minimal safe step', 'Verification target']) {
-  if (intake.includes(phrase)) {
-    pass(`instruction-intake-guardrails covers ${phrase}`);
+  const compatPath = `.openclaw/skills/${name}/SKILL.md`;
+  if (!exists(compatPath)) {
+    fail(`${compatPath} is missing`);
+  } else if (readText(relativePath) === readText(compatPath)) {
+    pass(`${compatPath} matches ${relativePath}`);
   } else {
-    fail(`instruction-intake-guardrails should cover ${phrase}`);
+    fail(`${compatPath} must match ${relativePath}`);
   }
 }
 
-for (const phrase of ['First Principles', '第一性原理']) {
-  if (intake.includes(phrase)) {
-    pass(`instruction-intake-guardrails covers ${phrase}`);
-  } else {
-    fail(`instruction-intake-guardrails should cover ${phrase}`);
-  }
-}
+const skillContentChecks = {
+  'first-principles-prompt': ['First Principles', '第一性原理', 'Real objective', 'Minimal sufficient action', 'Verification target'],
+  'adversarial-prompt-review': ['Misread test', 'Scope attack', 'Authorization attack', 'Evidence attack', 'Failure-mode attack'],
+  'uncertainty-check': ['least certain', 'Least certain item', 'Claim edit', 'Never claim completion solely from confidence'],
+  'omission-check': ['biggest thing I may have omitted', 'Requested outputs', 'Blind spot', 'Side effect', 'Final response edit']
+};
 
-const finalResponse = exists('skills/final-response-guardrails/SKILL.md')
-  ? readText('skills/final-response-guardrails/SKILL.md')
-  : '';
-for (const phrase of ['Verification evidence', 'Unfinished items', 'Blockers', 'Overpromising', 'Never claim completion solely from confidence']) {
-  if (finalResponse.includes(phrase)) {
-    pass(`final-response-guardrails covers ${phrase}`);
-  } else {
-    fail(`final-response-guardrails should cover ${phrase}`);
+for (const [name, phrases] of Object.entries(skillContentChecks)) {
+  const relativePath = `skills/${name}/SKILL.md`;
+  const content = exists(relativePath) ? readText(relativePath) : '';
+  for (const phrase of phrases) {
+    if (content.includes(phrase)) {
+      pass(`${name} covers ${phrase}`);
+    } else {
+      fail(`${name} should cover ${phrase}`);
+    }
   }
 }
 
@@ -126,7 +161,7 @@ if (exists('README.md')) {
     }
   }
 
-  for (const name of skillNames) {
+  for (const name of requiredSkillNames) {
     if (readme.includes(name)) {
       pass(`README.md mentions ${name}`);
     } else {
@@ -148,7 +183,7 @@ for (const adapter of ['marketplaces/claude-code', 'marketplaces/codex']) {
   const manifest = exists(`${adapter}/manifest.json`) ? parseJson(`${adapter}/manifest.json`) : null;
   if (manifest && Array.isArray(manifest.skills)) {
     const names = manifest.skills.map((skill) => skill.name);
-    for (const name of skillNames) {
+    for (const name of requiredSkillNames) {
       if (names.includes(name)) {
         pass(`${adapter}/manifest.json includes ${name}`);
       } else {
@@ -163,7 +198,7 @@ for (const adapter of ['marketplaces/claude-code', 'marketplaces/codex']) {
 const openclaw = exists('openclaw.json') ? parseJson('openclaw.json') : null;
 if (openclaw && Array.isArray(openclaw.skills)) {
   const names = openclaw.skills.map((skill) => skill.name);
-  for (const name of skillNames) {
+  for (const name of requiredSkillNames) {
     if (names.includes(name)) {
       pass(`openclaw.json includes ${name}`);
     } else {
@@ -189,7 +224,7 @@ if (meta) {
   }
 
   if (Array.isArray(meta.skills)) {
-    for (const name of skillNames) {
+    for (const name of requiredSkillNames) {
       if (meta.skills.includes(name)) {
         pass(`meta.json includes ${name}`);
       } else {
@@ -198,6 +233,25 @@ if (meta) {
     }
   } else {
     fail('meta.json must contain a skills array');
+  }
+
+  if (Array.isArray(meta.core_skills) && coreSkillNames.every((name) => meta.core_skills.includes(name))) {
+    pass('meta.json lists the four core skills');
+  } else {
+    fail('meta.json must list the four core skills');
+  }
+}
+
+for (const relativePath of listFiles('.')) {
+  if (relativePath.startsWith('.git/')) continue;
+  const absolute = path.join(root, relativePath);
+  const buffer = fs.readFileSync(absolute);
+  if (buffer.includes(0)) continue;
+  const text = buffer.toString('utf8');
+  for (const term of bannedTerms) {
+    if (text.toLowerCase().includes(term.toLowerCase())) {
+      fail(`${relativePath} must not mention banned reference term`);
+    }
   }
 }
 

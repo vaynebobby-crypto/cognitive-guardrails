@@ -1,7 +1,21 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "required_binaries": [],
   "skills": [
+    "first-principles-prompt",
+    "adversarial-prompt-review",
+    "uncertainty-check",
+    "omission-check",
+    "instruction-intake-guardrails",
+    "final-response-guardrails"
+  ],
+  "core_skills": [
+    "first-principles-prompt",
+    "adversarial-prompt-review",
+    "uncertainty-check",
+    "omission-check"
+  ],
+  "compatibility_skills": [
     "instruction-intake-guardrails",
     "final-response-guardrails"
   ]

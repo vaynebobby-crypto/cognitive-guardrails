@@ -1,11 +1,18 @@
 # Cognitive Guardrails
 
-`cognitive-guardrails` now ships two independent installable skills:
+`cognitive-guardrails` is a skill group for AI agent reasoning guardrails. It makes four checks independently installable and independently triggerable:
 
-- `instruction-intake-guardrails`: use after receiving an instruction and before execution, including a First Principles check.
-- `final-response-guardrails`: use after completing work and before the final response.
+- `first-principles-prompt`: before execution, reason from first principles instead of following habitual implementation paths.
+- `adversarial-prompt-review`: before or during execution, adversarially review the prompt, plan, assumptions, scope, authorization, evidence, and failure modes.
+- `uncertainty-check`: after execution and before delivery, answer what you are least certain about.
+- `omission-check`: after execution and before delivery, answer what may be the biggest omission or unnoticed blind spot.
 
-The root `SKILL.md` is kept only as a compatibility and migration entry. Install the two directories under `skills/`.
+The repository also keeps compatibility aggregate entries:
+
+- `instruction-intake-guardrails`: pre-execution aggregate for older installs.
+- `final-response-guardrails`: pre-delivery aggregate for older installs.
+
+Install skill directories from `skills/<slug>/SKILL.md`. OpenClaw-compatible copies are available under `.openclaw/skills/<slug>/SKILL.md`.
 
 ## Install
 
@@ -16,26 +23,57 @@ git clone https://github.com/vaynebobby-crypto/cognitive-guardrails.git
 cd cognitive-guardrails
 ```
 
-Install or register these directories in your client:
+Recommended core skills:
+
+```text
+skills/first-principles-prompt/
+skills/adversarial-prompt-review/
+skills/uncertainty-check/
+skills/omission-check/
+```
+
+Compatibility aggregate skills:
 
 ```text
 skills/instruction-intake-guardrails/
 skills/final-response-guardrails/
 ```
 
-Claude Code and Codex do not have a single universal marketplace command across all local setups. This repository provides client adaptation manifests under:
+Claude Code and Codex adaptation manifests are provided under:
 
 - `marketplaces/claude-code/`
 - `marketplaces/codex/`
 
-Use those manifests as packaging metadata, or symlink the two skill directories into the client-specific local skills directory.
+For local installs, symlink or copy the desired skill directories into the client-specific local skills directory. If the client does not auto-detect new skills, restart or reload it.
 
-Before execution, `instruction-intake-guardrails` returns to the user's real goal, strips away default methods and habitual paths, keeps only the facts, constraints, and authorization boundaries that must hold, then chooses the smallest safe action.
+## Usage
+
+Before execution:
+
+```text
+Use first-principles-prompt before choosing an implementation path.
+Use adversarial-prompt-review before executing the plan.
+```
+
+Before final delivery:
+
+```text
+Use uncertainty-check before the final answer.
+Use omission-check before the final answer.
+```
+
+Older configurations can continue to use:
+
+```text
+Use instruction-intake-guardrails before starting.
+Use final-response-guardrails before the final answer.
+```
 
 ## Validate
 
 ```bash
 node scripts/check-skill.cjs
+git diff --check
 ```
 
-The check validates both skill frontmatters, Chinese README coverage, client adaptation files, and repository metadata.
+The check validates required skills, frontmatter, Chinese README coverage, client adaptation files, metadata, banned reference names, and `.openclaw/skills` compatibility copies.
