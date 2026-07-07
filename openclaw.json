@@ -7,7 +7,7 @@
   "skills": [
     {
       "name": "instruction-intake-guardrails",
-      "description": "Pre-task instruction understanding, authorization boundary, goal drift, risk, blocker, and verification planning guardrails.",
+      "description": "Pre-task instruction understanding, first principles, authorization boundary, goal drift, risk, blocker, and verification planning guardrails.",
       "install_path": "skills/instruction-intake-guardrails",
       "entrypoint": "skills/instruction-intake-guardrails/SKILL.md"
     },

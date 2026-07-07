@@ -1,6 +1,6 @@
 # Claude Code Adapter
 
-This directory provides local packaging metadata for Claude Code setups that support custom skills or prompt libraries.
+This directory provides local packaging metadata for Claude Code setups that support custom skills or prompt libraries. The instruction intake skill includes a First Principles check before execution.
 
 There is no repository-wide assumption that Claude Code exposes one universal official marketplace install command. Use the manifest here as an adapter description, or register the two skill directories manually:
 

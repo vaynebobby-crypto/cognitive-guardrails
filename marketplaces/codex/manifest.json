@@ -9,7 +9,8 @@
       "name": "instruction-intake-guardrails",
       "path": "../../skills/instruction-intake-guardrails",
       "entrypoint": "../../skills/instruction-intake-guardrails/SKILL.md",
-      "phase": "before_execution"
+      "phase": "before_execution",
+      "summary": "Pre-task intake with First Principles, authorization boundary, goal drift, risk, blockers, and verification planning."
     },
     {
       "name": "final-response-guardrails",

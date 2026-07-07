@@ -90,6 +90,14 @@ for (const phrase of ['Authorization boundary', 'Goal drift', 'Blockers', 'Minim
   }
 }
 
+for (const phrase of ['First Principles', '第一性原理']) {
+  if (intake.includes(phrase)) {
+    pass(`instruction-intake-guardrails covers ${phrase}`);
+  } else {
+    fail(`instruction-intake-guardrails should cover ${phrase}`);
+  }
+}
+
 const finalResponse = exists('skills/final-response-guardrails/SKILL.md')
   ? readText('skills/final-response-guardrails/SKILL.md')
   : '';

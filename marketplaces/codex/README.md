@@ -1,6 +1,6 @@
 # Codex Adapter
 
-This directory provides local packaging metadata for Codex-style skill installations.
+This directory provides local packaging metadata for Codex-style skill installations. The instruction intake skill includes a First Principles check before execution.
 
 There is no repository-wide assumption that Codex exposes one universal official marketplace install command. For local installs, symlink or copy both skill directories into the configured skills directory:
 
