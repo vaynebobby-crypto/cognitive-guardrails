@@ -1,201 +1,160 @@
 # Cognitive Guardrails
 
-`cognitive-guardrails` is an installable OpenClaw Marketplace skill and client-neutral prompt package that adds a deliberate reasoning and safety review pass to AI-assisted work.
+`cognitive-guardrails` 现在是一个双 skill 仓库，提供两个可独立安装的 AI 工作护栏：
 
-It helps agents slow down at the right moment, challenge assumptions, and repair weak spots before handing over code, writing, plans, business proposals, or operational decisions.
+- `instruction-intake-guardrails`：收到指令之后、开始执行前触发，用于理解任务、确认授权边界、识别目标漂移、风险和阻塞项。
+- `final-response-guardrails`：完成工作之后、最终回复前触发，用于复核交付声明、验证证据、未完成项、阻塞项和过度承诺。
 
-## Purpose
+根目录 `SKILL.md` 只保留为兼容入口和迁移说明。新的安装单元在 `skills/<slug>/SKILL.md`。
 
-Use this skill for planning, research synthesis, debugging hypotheses, architecture decisions, operational changes, security-sensitive work, external publication, or any high-stakes answer that needs disciplined uncertainty handling.
+英文说明见 [README.en.md](README.en.md)。
 
-It helps detect:
+## 用途
 
-- goal drift and unauthorized side quests;
-- deletion, overwrite, permission, or external-send actions without explicit approval;
-- overpromising or claiming unverified success;
-- treating assumptions as facts;
-- bypassing blockers instead of reporting them;
-- ignoring blast radius, reversibility, privacy, security impact, and omitted stakeholders.
+这两个 skill 用来把一个原本混合的“思考/交付复核”流程拆成两个明确阶段：
 
-The skill is intentionally lightweight: it has no runtime network dependency, no credentials, and no deterministic action script. It is a reasoning protocol and safety checklist, not a tool for bypassing user authorization or platform policy.
+- 执行前：先确认用户到底授权了什么，哪些动作需要再次确认，是否存在删除、推送、外发、权限变更、凭据、生产环境或用户数据风险。
+- 回复前：再确认实际完成了什么、验证了什么、哪些没有完成、哪些被阻塞，以及最终回复是否暗示了未发生的部署、监控、发布或保证。
 
-## Checkpoints
+它们没有运行时网络依赖，不需要凭据，也不会替代用户授权或平台安全策略。
 
-- **First principles**: Rebuild the answer from the real goal and the facts that must be true.
-- **Least certain / under-investigated**: Identify the weakest claim, dependency, or assumption.
-- **Adversarial review**: Attack the output from the viewpoint of a skeptical reviewer, maintainer, buyer, user, operator, or opponent.
-- **Largest omission**: Find the missing stakeholder, constraint, test, risk, dependency, approval, or next step.
+## 安装
 
-## Use Cases
+### 通用本地安装
 
-- Code design, implementation plans, refactors, reviews, and release checks
-- Technical writing, proposals, documentation, and decision records
-- Business strategy, product plans, market arguments, and operating plans
-- Personal or organizational decisions where hidden assumptions and omissions matter
-- Operational changes that may touch production, credentials, user data, scheduled jobs, or external publishing
-
-## Installation
-
-### OpenClaw Marketplace / ClawHub
-
-After publication under the `cognitive-guardrails` slug:
-
-```bash
-openclaw skills install cognitive-guardrails
-```
-
-### OpenClaw from Git
-
-```bash
-openclaw skills install git:https://github.com/vaynebobby-crypto/cognitive-guardrails.git --as cognitive-guardrails
-```
-
-### OpenClaw local checkout
+把仓库克隆到本机：
 
 ```bash
 git clone https://github.com/vaynebobby-crypto/cognitive-guardrails.git
 cd cognitive-guardrails
-openclaw skills install "$(pwd)" --as cognitive-guardrails
 ```
 
-If a previous local install exists:
+安装时应指向两个独立目录：
 
-```bash
-openclaw skills install "$(pwd)" --as cognitive-guardrails --force
+```text
+skills/instruction-intake-guardrails/
+skills/final-response-guardrails/
 ```
 
-### Symlink fallback
-
-If your OpenClaw version does not expose `openclaw skills install`, symlink the repository into the user skills directory:
-
-```bash
-mkdir -p ~/.openclaw/skills
-ln -s "$(pwd)" ~/.openclaw/skills/cognitive-guardrails
-openclaw skills check
-```
-
-For a workspace-local install, use the workspace skills directory instead:
-
-```bash
-mkdir -p .openclaw/skills
-ln -s "$(pwd)" .openclaw/skills/cognitive-guardrails
-openclaw skills check
-```
+不要把根目录 `SKILL.md` 当成唯一新版本 skill 安装；它只是兼容入口。
 
 ### Claude Code
 
-Claude Code supports project and user-level instructions, and local setups may differ. If your installation exposes a custom skills or prompts directory, copy or symlink this repository there:
+Claude Code 没有一个对所有环境统一的官方 marketplace 安装命令。本仓库提供适配清单：
+
+- [marketplaces/claude-code/manifest.json](marketplaces/claude-code/manifest.json)
+- [marketplaces/claude-code/README.md](marketplaces/claude-code/README.md)
+
+如果你的 Claude Code 环境使用本地 skills 目录，可复制或软链接两个 skill 目录，例如：
 
 ```bash
 mkdir -p ~/.claude/skills
-ln -s "$(pwd)" ~/.claude/skills/cognitive-guardrails
+ln -s "$(pwd)/skills/instruction-intake-guardrails" ~/.claude/skills/instruction-intake-guardrails
+ln -s "$(pwd)/skills/final-response-guardrails" ~/.claude/skills/final-response-guardrails
 ```
 
-If your setup uses project instructions instead, reference `SKILL.md` from your project-level Claude instructions and keep `references/prompt-templates.md` available for copy-ready prompts.
+如果你的环境通过项目级指令或提示库管理 skill，请把两个 `SKILL.md` 分别注册为独立条目，并保留 `references/prompt-templates.md` 作为可复制模板。
 
 ### Codex
 
-For Codex-style local skills, install into the configured skills directory. The exact path depends on your Codex home:
+Codex 的本地 skill 目录取决于 `CODEX_HOME` 或具体客户端配置。本仓库提供适配清单：
+
+- [marketplaces/codex/manifest.json](marketplaces/codex/manifest.json)
+- [marketplaces/codex/README.md](marketplaces/codex/README.md)
+
+常见本地安装方式：
 
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-ln -s "$(pwd)" "${CODEX_HOME:-$HOME/.codex}/skills/cognitive-guardrails"
+ln -s "$(pwd)/skills/instruction-intake-guardrails" "${CODEX_HOME:-$HOME/.codex}/skills/instruction-intake-guardrails"
+ln -s "$(pwd)/skills/final-response-guardrails" "${CODEX_HOME:-$HOME/.codex}/skills/final-response-guardrails"
 ```
 
-Restart or reload the client if it does not detect new skills automatically.
+如果客户端不会自动发现新 skill，请重启或重新加载客户端。
 
-### Pi and other clients
+### OpenClaw / 其他客户端
 
-If your client has no universal public CLI skill-install format:
+[openclaw.json](openclaw.json) 描述两个独立 skill 的路径和元数据。若客户端支持从 manifest 读取多个 skill，可读取该文件；若不支持，请按目录手动安装两个 `skills/<slug>`。
 
-1. Keep this repository cloned locally.
-2. Add the contents of `SKILL.md` to the client's custom instructions, prompt library, or equivalent local configuration.
-3. Use `references/prompt-templates.md` when you need a generation pass or delivery pass prompt.
+不要在文档中假设某个客户端存在统一 marketplace 命令。发布到真实外部 marketplace 前，需要先确认目标客户端的当前发布流程。
 
-## Usage
+## 使用方式
 
-Invoke explicitly when you want an agent to run the checklist:
+执行前显式调用：
 
 ```text
-/use cognitive-guardrails review this deployment plan
+Use instruction-intake-guardrails before starting this refactor.
 ```
 
-Agents should also use it automatically when they are about to perform or summarize work involving:
-
-- destructive or externally visible changes;
-- permissions, secrets, production, finances, compliance, safety, or user data;
-- decisions based on incomplete evidence;
-- completion claims that need verification.
-
-### Generation pass
+回复前显式调用：
 
 ```text
-Use Cognitive Guardrails while drafting a release plan for this service. Apply first principles, least certain / under-investigated, adversarial review, and largest omission before finalizing.
+Use final-response-guardrails before the final answer.
 ```
 
-### Delivery pass
+也可以让代理按阶段自动触发：
 
-```text
-Run a Cognitive Guardrails delivery pass on this proposal. Return required revisions, residual uncertainty, and a tightened final version.
-```
+- 开始执行前：任务有歧义、可能越权、可能破坏或外发、依赖假设、存在阻塞项。
+- 最终回复前：要声明完成、报告测试、给出 commit/hash/链接、说明未完成项或风险。
 
-More copy-ready prompts are in [references/prompt-templates.md](references/prompt-templates.md).
+更多模板见 [references/prompt-templates.md](references/prompt-templates.md)。
 
-## Directory structure
+## 目录结构
 
 ```text
 cognitive-guardrails/
-├── SKILL.md                    # Marketplace skill definition and checklist
-├── README.md                   # Purpose, installation, usage, and validation guide
-├── openclaw.json               # Lightweight Marketplace/client metadata
-├── meta.json                   # Simple version/dependency metadata for local checks
-├── LICENSE                     # MIT license
+├── SKILL.md
+├── README.md
+├── README.en.md
+├── openclaw.json
+├── meta.json
+├── skills/
+│   ├── instruction-intake-guardrails/
+│   │   └── SKILL.md
+│   └── final-response-guardrails/
+│       └── SKILL.md
+├── marketplaces/
+│   ├── claude-code/
+│   │   ├── README.md
+│   │   └── manifest.json
+│   └── codex/
+│       ├── README.md
+│       └── manifest.json
 ├── references/
-│   └── prompt-templates.md     # Copy-ready generation and delivery pass prompts
+│   └── prompt-templates.md
 ├── scripts/
-│   └── check-skill.cjs         # Local structural/frontmatter validation helper
-└── .gitignore
+│   └── check-skill.cjs
+└── LICENSE
 ```
 
-## Validation
+## 验证
 
-Run the repository-local structural check:
+运行仓库自带结构校验：
 
 ```bash
 node scripts/check-skill.cjs
 ```
 
-Optional OpenClaw validation from any directory:
+校验内容包括：
 
-```bash
-openclaw skills check
-```
+- 两个独立 `SKILL.md` 存在。
+- frontmatter 包含正确的 `name` 和带引号的 `description`。
+- 根目录 README 以中文为主，并包含安装、使用、目录结构、验证、发布说明。
+- Claude Code 和 Codex 的适配 manifest/README 存在。
+- `openclaw.json`、`meta.json` 可解析并列出两个 skill。
 
-If installed locally, confirm OpenClaw can list or inspect it with the available OpenClaw skill commands in your environment.
+## 发布
 
-## Marketplace Metadata
+发布 GitHub 前：
 
-`openclaw.json` provides lightweight metadata for clients or marketplaces that can ingest a manifest. It is intentionally minimal and does not claim support for non-existent install commands.
+1. 更新两个 skill 内容和共享模板。
+2. 运行 `node scripts/check-skill.cjs`。
+3. 确认 `git status --short` 只包含本次预期改动。
+4. 正常 `git commit`，不要强推。
+5. `git push origin main`。
 
-## Publishing checklist
+发布到 Claude Code、Codex 或其他真实外部 marketplace 前，先确认该客户端当前支持的格式、审核流程和命令。本仓库只提供本地适配 manifest 与目录结构，不虚构官方 marketplace 命令。
 
-Before submitting to Marketplace/ClawHub:
+## 安全
 
-1. Confirm `SKILL.md` is at the repository root.
-2. Confirm frontmatter contains `name: cognitive-guardrails` and a quoted `description`.
-3. Run `node scripts/check-skill.cjs`.
-4. Run `openclaw skills check` if available.
-5. Update `meta.json` / `openclaw.json` version metadata for a release.
-6. Get explicit approval before pushing to GitHub or publishing to Marketplace.
-
-## Security and privacy
-
-This skill has no runtime network requirement and does not need credentials. It should make agents more conservative about destructive, external, or sensitive actions; it must not be used to justify bypassing safety policy, user approval, or local verification.
-
-## Contributing
-
-Contributions should keep the skill compact, practical, and client-neutral. Put long examples or reusable prompts in `references/` rather than expanding `SKILL.md`.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+这两个 skill 的目的都是让代理更保守地处理授权、证据和交付声明。它们不能用于绕过审批、删除保护、安全策略、凭据限制或用户授权边界。

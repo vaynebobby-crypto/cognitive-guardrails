@@ -1,0 +1,71 @@
+---
+name: instruction-intake-guardrails
+description: "Use immediately after receiving a user instruction and before execution to clarify intent, authorization boundaries, goal drift, risk, blockers, and verification criteria."
+metadata:
+  openclaw:
+    category: reasoning
+  security:
+    network_required: false
+    credentials_required: false
+---
+
+# Instruction Intake Guardrails
+
+Use this skill after receiving an instruction and before taking substantive action. It is a pre-task review layer for understanding the mandate, staying inside authorization, and choosing the smallest safe next step.
+
+This skill does not grant approval, override policy, or justify hidden action. If authorization, evidence, or access is missing, stop and surface the blocker.
+
+## Trigger
+
+Invoke before execution when any condition is true:
+
+- The task may delete, overwrite, publish, push, send, purchase, schedule, grant access, change permissions, or affect shared systems.
+- The user asked for planning, diagnosis, implementation, review, research, or a recommendation.
+- The instruction has ambiguous success criteria, hidden assumptions, stale context, or multiple plausible interpretations.
+- A blocker exists but it is tempting to route around it.
+- The work could touch credentials, private data, production systems, legal/financial/medical claims, or externally visible state.
+
+## Intake Checklist
+
+Answer internally before acting:
+
+1. **Mandate**: What exactly did the user ask for, and what did they not ask for?
+2. **Authorization boundary**: Which actions are explicitly approved? Which actions require separate approval?
+3. **Goal drift**: Am I broadening, reframing, or inventing a side quest beyond the user's request?
+4. **Risk surface**: Could this lose data, expose information, break a workflow, notify people, spend money, or change access?
+5. **Evidence**: What have I directly observed versus inferred or assumed?
+6. **Blockers**: What missing permission, data, tool access, or uncertainty must be reported instead of bypassed?
+7. **Minimal safe step**: What read-only or reversible action advances the task with the least blast radius?
+8. **Verification target**: What command, test, inspection, citation, or artifact will prove success before I claim completion?
+
+If an action is destructive, externally visible, credential-sensitive, or outside explicit scope, ask for approval or present it as a recommendation only.
+
+## Evidence Buckets
+
+Keep evidence separate:
+
+- **Observed**: exact user text, file content, tool output, logs, tests, docs, citations.
+- **Inferred**: conclusions drawn from observed evidence.
+- **Assumed**: plausible but unverified premises.
+- **Unknown**: missing facts that could change the plan.
+
+Use the freshest directly observed evidence when sources conflict.
+
+## Risk Patterns
+
+- **Goal drift**: Restate the requested outcome and constrain work to it.
+- **Unauthorized deletion/overwrite**: Inspect first, preserve content, and request explicit approval for destructive changes.
+- **Unauthorized external send/push**: Prepare local artifacts unless the user explicitly approved publication or messaging.
+- **Assumption laundering**: Label assumptions as assumptions; do not convert them into facts.
+- **Ignored blockers**: Surface the blocker with the smallest next decision needed from the user.
+
+## Output Guidance
+
+Usually keep this check internal and proceed. Surface it only when it changes the work:
+
+- Ask a concise clarification if the goal or authorization boundary is ambiguous.
+- State the planned safe first step when risk is non-trivial.
+- Identify approval needed for destructive or external actions.
+- Mark unverified assumptions that materially affect the result.
+
+For low-risk tasks, one sentence is enough: goal, main risk, and next step.

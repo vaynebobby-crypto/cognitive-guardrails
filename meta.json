@@ -1,4 +1,8 @@
 {
-  "version": "0.1.0",
-  "required_binaries": []
+  "version": "0.2.0",
+  "required_binaries": [],
+  "skills": [
+    "instruction-intake-guardrails",
+    "final-response-guardrails"
+  ]
 }

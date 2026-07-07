@@ -2,48 +2,48 @@
 
 Use these templates as copy-ready prompts. Replace bracketed text with task-specific details.
 
-## Generation Pass
+## Instruction Intake Pass
 
 ```text
-Use Cognitive Guardrails while producing this work.
+Use instruction-intake-guardrails before starting.
 
 Task:
-[Describe the output needed.]
+[Describe the requested work.]
 
 Context and constraints:
-[Add audience, scope, format, tools, deadlines, risk tolerance, and known facts.]
+[Add scope, tools, approvals already granted, known risks, deadlines, and success criteria.]
 
-Before finalizing, apply these checkpoints:
-1. First principles: What must be true for the answer to work? Which assumptions are optional?
-2. Least certain / under-investigated: What part has the weakest evidence? Does it need verification?
-3. Adversarial review: How would a skeptical reviewer attack this output?
-4. Largest omission: What important factor, dependency, risk, or next step is missing?
-
-Revise the output where the checkpoints reveal real issues. Keep the final answer concise and actionable.
+Return only material issues before execution:
+- Clarified mandate
+- Authorization boundary
+- Goal drift risk
+- Destructive/external/sensitive actions requiring approval
+- Blockers or missing evidence
+- Smallest safe next step
+- Verification target
 ```
 
-## Delivery Pass
+## Final Response Pass
 
 ```text
-Run a Cognitive Guardrails delivery pass on the draft below.
+Use final-response-guardrails before sending the final answer.
 
-Draft:
+Draft final response:
 [Paste draft.]
 
-Evaluate it against:
-1. First principles: Does the draft solve the actual goal, or only follow inherited defaults?
-2. Least certain / under-investigated: Which claim, dependency, or implementation detail is least supported?
-3. Adversarial review: What are the strongest objections, edge cases, or failure modes?
-4. Largest omission: What important factor is absent?
+Check:
+- Does it match the requested outcome?
+- What was actually completed?
+- What evidence verifies the result?
+- What remains unfinished or blocked?
+- Does it overpromise future action or unverified success?
+- Are residual risks or assumptions stated only when they matter?
 
-Return:
-- Required revisions, if any
-- Residual uncertainty, if any
-- A tightened final version
+Return a tightened final response.
 ```
 
 ## Compact Inline Prompt
 
 ```text
-Apply Cognitive Guardrails: first principles, least certain point, adversarial review, and largest omission. Fix material issues before answering; mention only the risks that still matter.
+Apply instruction-intake-guardrails before acting and final-response-guardrails before answering. Stay inside explicit authorization, verify before claiming completion, and state blockers or unfinished work plainly.
 ```

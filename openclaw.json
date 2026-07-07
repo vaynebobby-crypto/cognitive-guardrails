@@ -1,18 +1,29 @@
 {
   "name": "cognitive-guardrails",
-  "description": "A compact AgentSkill that applies four reasoning checkpoints: first principles, least certain / under-investigated, adversarial review, and largest omission.",
-  "version": "0.1.0",
+  "description": "A two-skill guardrail package for instruction intake review and final response review.",
+  "version": "0.2.0",
   "license": "MIT",
-  "install_path": "skills/cognitive-guardrails",
-  "entrypoint": "SKILL.md",
+  "repository": "https://github.com/vaynebobby-crypto/cognitive-guardrails",
+  "skills": [
+    {
+      "name": "instruction-intake-guardrails",
+      "description": "Pre-task instruction understanding, authorization boundary, goal drift, risk, blocker, and verification planning guardrails.",
+      "install_path": "skills/instruction-intake-guardrails",
+      "entrypoint": "skills/instruction-intake-guardrails/SKILL.md"
+    },
+    {
+      "name": "final-response-guardrails",
+      "description": "Pre-final delivery review for claims, verification evidence, unfinished work, blockers, uncertainty, and overpromising.",
+      "install_path": "skills/final-response-guardrails",
+      "entrypoint": "skills/final-response-guardrails/SKILL.md"
+    }
+  ],
+  "compatibility_entrypoint": "SKILL.md",
   "references": [
     "references/prompt-templates.md"
   ],
-  "supported_clients": [
-    "Claude Code",
-    "Codex",
-    "Pi",
-    "Copilot CLI",
-    "OpenClaw"
-  ]
+  "client_adapters": {
+    "claude_code": "marketplaces/claude-code/manifest.json",
+    "codex": "marketplaces/codex/manifest.json"
+  }
 }

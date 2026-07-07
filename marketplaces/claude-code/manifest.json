@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.1",
+  "client": "claude-code",
+  "package": "cognitive-guardrails",
+  "repository": "https://github.com/vaynebobby-crypto/cognitive-guardrails",
+  "notes": "Claude Code local installations vary. This manifest describes the two skill directories for local registration or packaging; it does not imply a universal official marketplace command.",
+  "skills": [
+    {
+      "name": "instruction-intake-guardrails",
+      "path": "../../skills/instruction-intake-guardrails",
+      "entrypoint": "../../skills/instruction-intake-guardrails/SKILL.md",
+      "phase": "before_execution"
+    },
+    {
+      "name": "final-response-guardrails",
+      "path": "../../skills/final-response-guardrails",
+      "entrypoint": "../../skills/final-response-guardrails/SKILL.md",
+      "phase": "before_final_response"
+    }
+  ]
+}
