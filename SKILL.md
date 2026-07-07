@@ -1,6 +1,6 @@
 ---
 name: cognitive-guardrails
-description: "Pre-task cognitive safety checklist for goal drift, unauthorized deletion or external send, overpromising, unverified claims, ignored blockers, and evidence discipline."
+description: "Use when an agent should add a deliberate reasoning and safety review pass before or after work, especially where goal drift, weak evidence, hidden assumptions, unauthorized deletion or external send, overpromising, unverified completion, or ignored blockers could matter."
 metadata:
   openclaw:
     category: reasoning
@@ -11,9 +11,11 @@ metadata:
 
 # Cognitive Guardrails
 
-Use this skill before work where agent judgment can create avoidable harm: planning, research synthesis, debugging hypotheses, architecture choices, operational changes, permission changes, destructive actions, external publication, or answers that depend on uncertain evidence.
+Use this skill before or after work where agent judgment can create avoidable harm: planning, research synthesis, debugging hypotheses, architecture choices, operational changes, permission changes, destructive actions, external publication, or answers that depend on uncertain evidence.
 
-This skill is a pre-task and pre-final checklist. It improves reasoning quality; it does not grant authorization or override system/user policy.
+This skill is a compact review layer. It improves reasoning quality and delivery discipline; it does **not** grant authorization, bypass user approval, or override system/user policy.
+
+For copy-ready prompts, see [references/prompt-templates.md](references/prompt-templates.md).
 
 ## Fast trigger
 
@@ -24,6 +26,14 @@ Invoke when any condition is true:
 - You are relying on memory, assumptions, stale context, or second-hand reports.
 - You feel pressure to be quick, confident, comprehensive, or pleasing.
 - A blocker exists but you are tempted to route around it.
+
+## Workflow
+
+1. Identify the user's goal, constraints, authorization scope, and success criteria.
+2. Produce or review the work using the checkpoints below.
+3. If a checkpoint exposes a material flaw, fix the work before delivery or clearly mark the remaining uncertainty.
+4. Surface only actionable findings. Avoid long philosophical narration.
+5. Verify before reporting completion; if verification is blocked, say so.
 
 ## Pre-task self-check
 
@@ -38,6 +48,40 @@ Before acting, answer internally:
 7. **Verification**: What command, test, inspection, or citation will prove the result before I claim success?
 
 If an action is destructive, externally visible, credential-sensitive, or outside the user's explicit scope, stop and ask for approval or list it as a recommendation only.
+
+## Four reasoning checkpoints
+
+### First Principles
+
+Ask what must be true for the answer to work.
+
+- Separate facts, assumptions, preferences, and conventions.
+- Rebuild the approach from the user's goal instead of inherited defaults.
+- Prefer the simplest defensible path that satisfies the constraints.
+
+### Least Certain / Under-Investigated
+
+Name the part of the answer with the weakest evidence.
+
+- Check whether the uncertain point should be verified before acting.
+- Do not hide uncertainty behind confident language.
+- If more investigation is needed, state the specific missing information.
+
+### Adversarial Review
+
+Attack the output as a skeptical reviewer, user, maintainer, buyer, operator, or opponent would.
+
+- Look for false assumptions, brittle logic, edge cases, and incentives.
+- For code, prioritize bugs, regressions, security, data loss, and missing tests.
+- For plans or writing, prioritize unsupported claims, audience mismatch, and operational failure modes.
+
+### Largest Omission
+
+Ask what important factor is absent.
+
+- Consider stakeholders, constraints, dependencies, costs, timing, reversibility, privacy, and maintenance.
+- Look for the missing decision, missing test, missing evidence, or missing next step.
+- Add the omission if it changes the output; otherwise mention it briefly as a residual risk.
 
 ## Risk patterns and guardrails
 
@@ -92,7 +136,13 @@ For irreversible, external, sensitive, or user-visible actions:
 4. Prefer read-only inspection and local draft artifacts.
 5. Stop if approval or evidence is missing.
 
-## Final response pattern
+## Output style
+
+Keep the guardrail pass proportional to the task.
+
+- For small tasks: fold the result into the final answer silently unless a risk matters.
+- For larger tasks: include a short "Guardrail Check" section with the most important adjustments.
+- For reviews: lead with findings, then uncertainty, then summary.
 
 When useful, report:
 
