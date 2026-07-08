@@ -2,7 +2,7 @@
 
 `cognitive-guardrails` 是一组 cognitive guardrails skills，用来把 AI 代理在执行前和交付前最容易滑过的判断显式化：从第一性原理出发、做对抗性审查、说明最没有把握的事情、检查最大的遗漏和未意识到的事情。
 
-这不是单个大 skill，而是一组可独立安装、可独立触发的技能。根目录 `SKILL.md` 只保留为兼容入口；新的安装单元在 `skills/<slug>/SKILL.md`，同时提供 `.openclaw/skills/<slug>/SKILL.md` 兼容路径。
+这不是单个大 skill，而是一组可独立安装、可独立触发的技能。根目录不放置 `SKILL.md`，避免被客户端误识别为一个臃肿的单体 skill；安装单元只在 `skills/<slug>/SKILL.md`，同时提供 `.openclaw/skills/<slug>/SKILL.md` 兼容路径。
 
 英文说明见 [README.en.md](README.en.md)。
 
@@ -130,7 +130,6 @@ Use final-response-guardrails before the final answer.
 
 ```text
 cognitive-guardrails/
-├── SKILL.md
 ├── README.md
 ├── README.en.md
 ├── openclaw.json

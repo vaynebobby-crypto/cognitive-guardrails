@@ -72,12 +72,18 @@ function parseFrontmatter(relativePath) {
   return frontmatter[1];
 }
 
-for (const file of ['SKILL.md', 'README.md', 'README.en.md', 'openclaw.json', 'meta.json']) {
+for (const file of ['README.md', 'README.en.md', 'openclaw.json', 'meta.json']) {
   if (exists(file)) {
     pass(`${file} exists`);
   } else {
     fail(`${file} is missing`);
   }
+}
+
+if (exists('SKILL.md')) {
+  fail('root SKILL.md must not exist; keep installable skills under skills/<slug>/SKILL.md');
+} else {
+  pass('root SKILL.md is absent');
 }
 
 if (coreSkillNames.length >= 4) {

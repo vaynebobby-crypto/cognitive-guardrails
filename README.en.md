@@ -12,7 +12,7 @@ The repository also keeps compatibility aggregate entries:
 - `instruction-intake-guardrails`: pre-execution aggregate for older installs.
 - `final-response-guardrails`: pre-delivery aggregate for older installs.
 
-Install skill directories from `skills/<slug>/SKILL.md`. OpenClaw-compatible copies are available under `.openclaw/skills/<slug>/SKILL.md`.
+Install skill directories from `skills/<slug>/SKILL.md`. The repository root intentionally does not contain a `SKILL.md`, so clients do not mis-detect the whole repository as one large skill. OpenClaw-compatible copies are available under `.openclaw/skills/<slug>/SKILL.md`.
 
 ## Install
 

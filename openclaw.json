@@ -56,7 +56,6 @@
       "compatibility": true
     }
   ],
-  "compatibility_entrypoint": "SKILL.md",
   "references": [
     "references/prompt-templates.md"
   ],
